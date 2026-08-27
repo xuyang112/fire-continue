@@ -30,3 +30,27 @@ The implementation follows the brief exactly, keeps state scoped by date and sta
 ## Concerns
 
 No known concerns within the requested scope. Concurrent writers are outside this task's specified interface and implementation.
+
+## Fix round 1: concurrency review finding
+
+### Root cause
+
+Concurrent `markSuccess` calls performed read-modify-write concurrently and shared the fixed `${path}.new` temporary path. Reproduction with 20 concurrent calls consistently produced `ENOENT` during rename.
+
+### Fix and coverage
+
+- Added an instance-local Promise write queue so each `markSuccess` completes its full read-modify-write before the next begins.
+- Added a UUID-based unique temporary filename for every atomic rename.
+- Added `preserves all records when successes are marked concurrently` coverage using `Promise.all` and 20 friends.
+
+### Fix verification
+
+- RED: focused concurrency test failed with `ENOENT` from the shared `state.json.new` rename.
+- GREEN: `npm test -- tests/state.test.ts` passed, 2 tests.
+- Full `npm test` passed, 2 test files / 4 tests.
+- `npm run build` passed with exit code 0.
+- `git diff --check` passed.
+
+### Fix round self-review
+
+The queue is scoped to one store instance as required; no cross-process lock was introduced. Queue rejection is isolated with `catch` so a later operation can proceed after an individual failure.
