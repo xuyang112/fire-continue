@@ -1,2 +1,29 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+config.json
+!config.example.json
+
+# Logs, caches, and temporary files
+*.log
+*.tmp
+*.temp
+.cache/
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local development workspaces
 .worktrees/
 .superpowers/sdd/
