@@ -27,3 +27,7 @@ Thumbs.db
 # Local development workspaces
 .worktrees/
 .superpowers/sdd/
+node_modules/
+dist/
+config.json
+*.log
